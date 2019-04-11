@@ -45,38 +45,47 @@ public class MoveTank : MonoBehaviour
         transform.RotateAround(transform.position, Vector3.up, Input.GetAxis("Horizontal") * 2) ;
         _rb.MovePosition(_rb.position + translateVector);
 
-        float h = Screen.currentResolution.height;
-        float w = Screen.currentResolution.width;
+        float h = Screen.height;
+        float w = Screen.width;
         if (Input.GetMouseButtonDown(0) && _misslesNumber > 0)
         {
-            missleAudio.PlayOneShot(impact, 1);
-            if (missleAudio.isPlaying)
-                Debug.Log("AAAAAA");
-            else
-            {
-                Debug.Log("NE AAAAAA");
-            }
-            _misslesNumber--;
+            //missleAudio.PlayOneShot(impact, 1);
+			missleAudio.Play();
+			//if (missleAudio.isPlaying)
+			//    Debug.Log("AAAAAA");
+			//else
+			//{
+			//    Debug.Log("NE AAAAAA");
+			//}
+			_misslesNumber--;
             Ray ray = Camera.main.ScreenPointToRay(new Vector2(w / 2, h / 2));
+			Debug.DrawRay(ray.origin, ray.direction * 100, Color.cyan);
             RaycastHit hit;
-            
+			GameObject missle;
             if (Physics.Raycast(ray, out hit, 120))
             {
-                Instantiate(misleEffect, hit.point, Quaternion.identity);
+				missle = Instantiate(misleEffect, hit.point, Quaternion.identity);
+				StartCoroutine(Destroyer(missle));
             }
         }
         
         if (Input.GetMouseButtonDown(1))
         {
-            Ray ray = Camera.main.ScreenPointToRay(new Vector2(w / 2, h / 2));
-            RaycastHit hit;
-            
-            if (Physics.Raycast(ray, out hit, 90))
+			gunleAudio.Play();
+			Ray ray = Camera.main.ScreenPointToRay(new Vector2(w /2, h /2));
+			RaycastHit hit;
+			GameObject missle;
+			if (Physics.Raycast(ray, out hit, 90))
             {
-                Instantiate(gunEffect, hit.point, Quaternion.identity);
-            }
-
-            gunleAudio.Play();
+				missle = Instantiate(gunEffect, hit.point, Quaternion.identity);
+				StartCoroutine(Destroyer(missle));
+			}
         }
     }
+
+	private IEnumerator Destroyer(GameObject missle)
+	{
+		yield return new WaitForSeconds(1);
+		Destroy(missle);
+	}
 }
